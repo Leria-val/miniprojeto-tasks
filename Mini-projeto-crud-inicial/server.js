@@ -9,7 +9,7 @@ const app = express();
 
 app.use(json());
 
-// Tus rutas principales
+app.get('/test', (req, res) => res.send('El servidor responde!'));
 app.use('/tasks', taskRouter);
 
 // Ruta para resetear/sincronizar el banco de datos (Útil para pruebas)
