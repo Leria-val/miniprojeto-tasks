@@ -1,29 +1,38 @@
 import { Sequelize } from "sequelize";
 import 'dotenv/config';
 
+// Definimos qué base de datos usar (puedes cambiarlo en el .env)
+const DB_TYPE = process.env.DB_TYPE || 'POSTGRES'; 
 
-const database = process.env.DB;
-const user = process.env.DB_USER;
-const password = process.env.DB_PASSWORD;
-const host = process.env.DB_HOST || "127.0.0.1";
+let sequelize;
 
-const sequelize = new Sequelize(database, user, password, {
-  host: host,
-  dialect: "postgres",
-  port: 5432,
-  logging: false, 
-  define: {
-    timestamps: true, 
-    underscored: true 
-  }
-});
+if (DB_TYPE === 'SQLITE') {
+  // Configuración para SQLite (Crea un archivo local .sqlite)
+  sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: './database/tasks_db.sqlite'
+  });
+} else {
+  // Configuración para PostgreSQL (Tu configuración actual)
+  sequelize = new Sequelize(
+    process.env.DB,          // tasks_db
+    process.env.DBUSER,     // postgres
+    process.env.DBPASSWORD, // senai
+    {
+      host: process.env.DBHOST || "127.0.0.1",
+      dialect: "postgres",
+      port: 5432,
+      logging: false
+    }
+  );
+}
 
 async function connect() {
   try {
     await sequelize.authenticate();
-    console.log("✅ Conexão com PostgreSQL estabelecida");
+    console.log(`✅ Conexão estabelecida com ${DB_TYPE}`);
   } catch (error) {
-    console.error("❌ Erro ao conectar no SQL:", error.message);
+    console.error(`❌ Erro ao conectar (${DB_TYPE}):`, error.message);
   }
 }
 
